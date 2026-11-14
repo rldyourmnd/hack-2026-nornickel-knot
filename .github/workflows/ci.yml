@@ -1,28 +1,38 @@
+# The repository's checks on GitHub's runners: the project's own install and tests, and the CI
+# library's merge stops on a pull request.
 name: ci
-
-# CI for rldyourmnd/hack-2026-nornickel-knot (public OSS, Python/uv).
-# Project: harmonic-labs (pyproject.toml + uv.lock).
-# Triggers: pull_request + workflow_dispatch ONLY (no push: cross-owner reusable).
-# Reusable workflows are pinned to an immutable ci-workflows SHA.
 
 on:
   pull_request:
+  push:
+    branches: [master]
   workflow_dispatch:
 
 permissions: {}
 
-concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   python:
-    name: python (3.13)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     permissions:
       contents: read
-    uses: NDDev-Technocracy-Archive/ci-workflows-20261014/.github/workflows/python-ci.yml@93eeb2a65e98a29e9dbff7909f67c6419abff046
-    with:
-      uv_version: "0.12.23"
-      python_version: '3.13'
-      install_command: 'uv sync --frozen'
-      test_command: 'uv run python -m compileall -q src'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: '0.13.7'
+          python-version: '3.13.18'
+          enable-cache: 'false'
+          activate-environment: 'true'
+      - name: Install and test
+        run: |
+          uv sync --frozen
+          uv run python -m compileall -q src
+
+  merge-stops:
+    if: github.event_name == 'pull_request'
+    uses: NDDev-Technocracy-OpenNetwork/nddev-ci/.github/workflows/merge-stops.yml@18cc86d2679f0fce863dc7752c1cb2117606ca01 # v0.6.52
+    permissions:
+      contents: read
