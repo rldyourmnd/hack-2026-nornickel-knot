@@ -169,3 +169,11 @@ edges: 159532
 ---
 
 <p align="center"><strong>Harmonic Labs — мостик между прошлым опытом и будущими открытиями.</strong></p>
+
+## Source CI
+
+`just setup` installs the frozen dependency set. `just check` validates the lock
+and Python syntax offline without importing the application, loading models or
+writing bytecode. `just verify` runs the complete source check after setup. CI
+prepares the unchanged SDK selections declared in `.github/workflows/ci.yml`.
+There is no application test suite in this command contract.
