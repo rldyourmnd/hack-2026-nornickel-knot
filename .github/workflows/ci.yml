@@ -18,5 +18,5 @@ jobs:
       setup: true
       timeout-minutes: 15
       hosted-runner: ubuntu-24.04
-      uv-version: 0.13.7
+      uv-version: 0.13.9
       python-version: 3.13.18
